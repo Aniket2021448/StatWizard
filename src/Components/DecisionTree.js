@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 
 // Define the DecisionTree component
 const DecisionTree = () => {
   // Define the decision tree structure as a flat array
-  const decisionTree = [
-    { id: 1, question: 'Is there only one variable of interest ?', yes: 2, no: 1 },
+    const decisionTree = [
+    { id: 1, question: 'Is there only one variable of interest ?', yes: 2, no: 18 },
     { id: 2, question: 'Is it a one sample problem ?', yes: 3, no: 8 },
     { id: 3, question: 'Is the underlying distribution normal or can central limit theorem be assumed to hold ?', yes: 6, no: 4 },
     { id: 4, question: 'Is the underlying distribution is binomial ?', yes: 44, no: 5 },
@@ -23,24 +24,24 @@ const DecisionTree = () => {
     { id: 16, question: ' Are the Samples independent ?', yes: 17, no: 52 },
     { id: 17, question: 'Are all expected values greater than equal to 5 ?', yes:37, no: 53 },
     // Aniket started question
-    { id: 18, question: 'Interested in relationship between two variables ?', yes: 19, no: 20 },~
+    { id: 18, question: 'Interested in relationship between two variables ?', yes: 19, no: 20 },
     { id: 19, question: 'Both variables continuous ?', yes: 21 , no: 23 },
-    { id: 20, question: 'More than two variables of interest, outcome variable continuous or binary ?', yes: 58 , no:1  },// error here
+    { id: 20, question: 'More than two variables of interest, outcome variable continuous or binary ?', continuous: 58, binary: 34 },
     { id: 21, question: 'Interested in predicting one variable from another ?', yes:57 , no: 22},//////////
     { id: 22, question: 'Interested in studying the correlation between two variables, Both variables normal ?', yes: 60, no: 56 },
     { id: 23, question: 'One variable continuous and one categorical ?', yes: 24, no: 25},
-    { id: 24, question: 'Analysis of Variance(ANOVA), Number of ways in which the categorical variable can be classified?', yes: 2, no: 3 }, // 1, 2, more than 2 quesion , flow chart page: 3
+    { id: 24, question: 'Analysis of Variance(ANOVA), Number of ways in which the categorical variable can be classified?', one:27,two:29,mtwo:30 }, // 1, 2, more than 2 quesion , flow chart page: 3
     { id: 25, question: 'Ordinal data ?', yes: 55, no: 26 },
-    { id: 26, question: 'Both variables categorical, Interested in tests of association or reproducibility ?', yes:61 , no:62  }, // association, reproducibility quesiton, flow char page: 3
-    { id: 27, question: 'Outcome variable normal or can central-limit theorem be assured to hold ?', yes: 2, no: 3 },
-    { id: 28, question: '1, Other covariates to be controlled for ?', yes: 2, no: 3 },
-    { id: 29, question: '2, Other covariates to be controlled for ?', yes: 2, no: 3 },
-    { id: 30, question: 'More than 2, Other covariates to be controlled for  ?', yes: 2, no: 3 },
+    { id: 26, question: 'Both variables categorical, Interested in tests of association or reproducibility ?', association:61 , reproductibility:62  }, // association, reproducibility quesiton, flow char page: 3
+    { id: 27, question: 'Outcome variable normal or can central-limit theorem be assured to hold ?', yes: 28, no:76  },
+    { id: 28, question: '1, Other covariates to be controlled for ?', yes: 79, no: 80 },
+    { id: 29, question: '2, Other covariates to be controlled for ?', yes: 77, no: 78 },
+    { id: 30, question: 'More than 2, Other covariates to be controlled for  ?', yes: 81, no: 82 },
     // done here
     { id: 31, question: 'One-sample problem ?', yes:63 , no: 32 },
     { id: 32, question: 'Incidence rates remain constant over time ?', yes: 33, no: 35 },
     { id: 33, question: 'Two-sample problem ?', yes:64 , no:65  },
-    
+    {id:34 , question :'Time of Events Important',yes:31,no:59},
     { id: 35, question: 'Use survival-analysis methods , Interested in comparison of survival curves of two groups with limited control of covariates ?', yes: 66, no:36 },
     { id: 36, question: 'Interested in effects, of several risk factors on survival\nWilling to assume several curve comes from a weibull distribution ?', yes: 67, no:68  },
     { id: 37, question: '2x2 contingency table ?', yes:69 , no: 38 },
@@ -87,40 +88,124 @@ const DecisionTree = () => {
     { id: 73, result: 'Use one-way ANOVA' },
     { id: 74, result: 'Use R x C contingency-table methods' },
     { id: 75, result: 'Use another underlying distribution or use nonparametrix methods such as kruskal-wallis test' },
+    {id:76,result:'Non-Parametric Anova Kruskal Wallis Test'},
+    {id:77,result:'Two-Way Ancova'},
+    {id:78,result:'Two-way Anova'},
+    {id:79,result:'One-way Ancova'},
+    {id:80,result:'One-way Anova'},
+    {id:81,result:'Higher-way Ancova'},
+    {id:82,result:'Higher-way Anova'},
     // Add more questions and outcomes as needed
   ];
 
   const [currentNodeIndex, setCurrentNodeIndex] = useState(0);
+  const [previousAnswers, setPreviousAnswers] = useState([]);
 
   const handleAnswer = (answer) => {
     const nextNodeIndex = decisionTree[currentNodeIndex][answer.toLowerCase()];
     if (typeof nextNodeIndex === 'number') {
+      setPreviousAnswers([...previousAnswers, currentNodeIndex]);
       setCurrentNodeIndex(nextNodeIndex - 1); // Adjust for 0-based indexing
+    }
+  };
+
+  const handleBack = () => {
+    if (previousAnswers.length > 0) {
+      const lastIndex = previousAnswers.pop();
+      setCurrentNodeIndex(lastIndex);
+      setPreviousAnswers([...previousAnswers]);
     }
   };
 
   const renderQuestion = () => {
     const currentQuestion = decisionTree[currentNodeIndex];
-    return (
-      <div className="max-w-lg mx-auto">
-  <p className="text-center text-lg mb-4">{currentQuestion.question}</p>
-  <div className="flex justify-center space-x-4">
-    <button
-      className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-      onClick={() => handleAnswer('Yes')}
-    >
-      Yes
-    </button>
-    <button
-      className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-red-300"
-      onClick={() => handleAnswer('No')}
-    >
-      No
-    </button>
-  </div>
-</div>
-
-    );
+    if (currentQuestion.one && currentQuestion.two && currentQuestion.mtwo) {
+      return (
+        <div className="max-w-lg mx-auto">
+          <p className="text-center text-lg mb-4">{currentQuestion.question}</p>
+          <div className="flex justify-center space-x-4">
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              onClick={() => handleAnswer('One')}
+            >
+              One
+            </button>
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-red-300"
+              onClick={() => handleAnswer('Two')}
+            >
+              Two
+            </button>
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-green-300"
+              onClick={() => handleAnswer('Mtwo')}
+            >
+              More than two
+            </button>
+          </div>
+        </div>
+      );
+    } else if (currentQuestion.binary && currentQuestion.continuous) {
+      return (
+        <div className="max-w-lg mx-auto ">
+          <p className="text-center text-lg mb-4 ">{currentQuestion.question}</p>
+          <div className="flex justify-center space-x-4">
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              onClick={() => handleAnswer('Continuous')}
+            >
+              Continuous
+            </button>
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-red-300"
+              onClick={() => handleAnswer('Binary')}
+            >
+              Binary
+            </button>
+          </div>
+        </div>
+      );
+    } else if (currentQuestion.association && currentQuestion.reproductibility) {
+      return (
+        <div className="max-w-lg mx-auto">
+          <p className="text-center text-lg mb-4">{currentQuestion.question}</p>
+          <div className="flex justify-center space-x-4">
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold border-2 border-white px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              onClick={() => handleAnswer('Association')}
+            >
+              Association
+            </button>
+            <button
+              className="bg-black hover:bg-slate-950 text-white font-semibold border-2 border-white px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-green-300"
+              onClick={() => handleAnswer('Reproductibility')}
+            >
+              Reproductibility
+            </button>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="max-w-lg mx-auto">
+          <p className="text-center text-lg mb-4">{currentQuestion.question}</p>
+          <div className="flex justify-center space-x-4">
+            <button
+              className="bg-black hover:bg-slate-950 text-white border-2 border-white  font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              onClick={() => handleAnswer('Yes')}
+            >
+              Yes
+            </button>
+            <button
+              className="bg-black hover:bg-slate-950 text-white border-2 border-white  font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring focus:ring-red-300"
+              onClick={() => handleAnswer('No')}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      );
+    }
   };
 
   const renderResult = () => {
@@ -136,8 +221,12 @@ const DecisionTree = () => {
   return (
     <div>
       {decisionTree[currentNodeIndex].question ? renderQuestion() : renderResult()}
+      {previousAnswers.length > 0 && (
+        <button onClick={handleBack} className='border-1 text-white bg-black rounded w-[50px] h-[25px] hover:bg-slate-200 hover:text-black'>Back</button>
+      )}
     </div>
   );
 };
 
 export default DecisionTree;
+
